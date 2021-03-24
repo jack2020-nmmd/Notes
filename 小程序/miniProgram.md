@@ -99,7 +99,10 @@ text是item里面的数据,变为forbar数据,引入了item的模板,页面使�
 ```html  
     如果是引入的.WXS文件,则在文件中要暴露属性,如module.exports={要暴露的东西,键值对模式},然后引入的时候要<wxs src="相对路径" module="要给这些数据重命名"/>  ~~~如果不是引入外部的.wxs文件,只是在wxml中书写wxs标签,则这样写<wxs module="给他命名">书写的内容,也要module.expoets = {暴露的属性,键值对模式}</wxs>.如果想在.wxs文件中引入wxs文件,使用require引入,const name = require('相对路径'),注意::,<wxs> 模块只能在定义模块的 WXML 文件中被访问到。使用 <include> 或 <import> 时，<wxs> 模块不会被引入到对应的 WXML 文件中。<template> 标签中，只能使用定义该 <template> 的 WXML 文件中定义的 <wxs> 模块(相当于template标签不能使用外部引入的),wxs里面的数据类型比js少了null,undefined和symbol,wxs里面的for循环语法与js的是一样的,但是标签里面的for循环不一样,注意  
 ```
-
+## 注册小程序
+    每个小程序都需要在app.js中调用APP方法注册小程序实例,绑定生命周期回调函数,错误监听和页面不存在监听函数等,整个小程序只有一个APP实例,获取APP上的数据或者调用开发者注册在APP中,获取实例const APPInstance= getApp()  
+    注册小程序:APP(Object Object)
+## 
 
 
 
