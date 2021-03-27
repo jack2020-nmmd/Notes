@@ -102,7 +102,121 @@ text是item里面的数据,变为forbar数据,引入了item的模板,页面使�
 ## 注册小程序
     每个小程序都需要在app.js中调用APP方法注册小程序实例,绑定生命周期回调函数,错误监听和页面不存在监听函数等,整个小程序只有一个APP实例,获取APP上的数据或者调用开发者注册在APP中,获取实例const APPInstance= getApp()  
     注册小程序:APP(Object Object)
-## 
+## APP{Object, Object}
+```css
+    onLaunch:       类型function,声明周期回调,监听小程序初始化,只触发一次
+    onShow:         类型function,生命周期回调,监听小程序启动或者切前台,小程序启动或者后台进来时启动
+    onHide:         类型function,生命周期回调,监听小程序切后台
+    onErr:          类型function,监听错误函数
+    onPageNotFound  类型function,页面不存在监听函数
+    onHandleRejection   类型function,未处理的promise拒绝事件监听函数
+    onThemeChange   类型function,监听系统主题变化
+    其他             类型any,开发者可以添加任何函数或者变量数据到Object参数中,用this可以访问
+    除了第一个以外,其余都可以使用wx.onApp+on后面的函数进行绑定监听
+    获取全局App属性:var appInstance = App.getApp(),注意不要在调用前使用,获取后不要私自调用生命周期函数,其实实例使用this就可以使用
+```
+## 注册小程序中的一个页面 Page(Object, Object),其指定页面的初始化数据,生命周期回调,事件处理函数等
+```css
+    data:       类型Object,页面的初始化数据
+    options:    类型Object,页面的组件选项,同components构造器中的options
+    onLoading:  类型function,生命周期回调,监听页面加载
+    onShow:     类型function,生命周期回调,监听页面显示
+    onReady     类型function,生命周期回调,监听页面初次渲染完成
+    onHide      类型function,生命周期回调,监听页面隐藏
+    onUnload    类型function,生命周期回调,监听页面卸载
+    onPullDownRefresh       类型function,监听下拉更新
+    onReachBottom           类型function,页面上拉触底事件的处理函数
+    onShareAppMessage       类型function,用户点击右上角转发
+    onShareTimeLine         类型function,用户转发到朋友圈
+    onAddToFavorites        类型function,用户点击右上角收藏
+    onPageScroll            类型function,页面滚动触发的处理函数
+    onResize                类型function,页面尺寸改变时触发
+    onTabItemTap            类型function,当前是 tab 页时，点击 tab 时触发
+    其他                    类型any,开发者可以添加任何参数到Object参数中,在页面函数中用this可以访问
+```
+
+## 属性具体分类
+### data
+    页面第一次渲染的数据是由data提供的,页面加载时,data将会以JSON字符串的形式由逻辑层传至渲染层,所以data中的数据必须是可以转成JSON的类型,如数组,字符串,对象布尔值,数字.渲染层接着通过WXML对数据进行绑定,书写与VUE的是一样的,只不过它是对象模式
+### 页面事件处理函数
+    onPullDownRefresh()监听用户下拉刷新,需要在App.js中配置开启enablePullDownRefresh,接着可以通过wx.startPullDownRefresh触发下拉刷新,调用后触发下拉刷新动画,与用户手拉刷新一样,当处理完数据刷新后,wx.stopPullDownRefresh可以停止当前页面的下拉刷新
+### 监听用户滑动页面的刷新
+    onPageScroll(Object, Object),属性scrollTop,是number类型表示页面在垂直方向已经滚动的距离(px),此方法在需要的时候在定义,以减少不必要的事件派发对渲染层-逻辑层通信的影响,且不要 在这方法大量触发setdata等引起逻辑层-渲染层通信的操作,尤其每次传输大量数据会影响通信效率
+### 进行收藏onAddToFavorites(Object object)
+    此事件处理函数需要 return 一个 Object，用于自定义收藏内容,返回的对象参数如:title(默认页面标题),imageURL(自定义图片,默认页面截图),query(自定义query字段,默认当前页面的query)
+```css
+    Page({
+        onAddToFavorites(res) {
+            // webview 页面返回 webViewUrl
+            console.log('webViewUrl: ', res.webViewUrl)
+            return {
+            title: '自定义标题',
+            imageUrl: 'http://demo.png',
+            query: 'name=xxx&age=xxx',
+            }
+        }
+    })
+```
+### onShareAppMessage(Object object)
+    注意：只有定义了此事件处理函数，右上角菜单才会显示“转发”按钮
+```css
+    Page({
+        onShareAppMessage() {
+            const promise = new Promise(resolve => {
+            setTimeout(() => {
+                resolve({
+                title: '自定义转发标题'
+                })
+            }, 2000)
+            })
+            return {
+            title: '自定义转发标题',
+            path: '/page/user?id=123',
+            promise 
+            }
+        }
+    })
+```
+### onShareTimeline()
+    注意：只有定义了此事件处理函数，右上角菜单才会显示“分享到朋友圈”按钮,事件处理函数返回一个 Object，用于自定义分享内容，不支持自定义页面路径,返回的Object与收藏的一样
+### 组件事件处理函数
+    Page 中还可以定义组件事件处理函数。在渲染层的组件中加入事件绑定，当事件被触发时，就会执行 Page 中定义的事件处理函数
+```css
+    <view bindtap="viewTap"> click me </view>
+    Page({
+        viewTap: function() {
+            console.log('view tap')
+        }
+    })
+```
+## 属性
+    Page.route是显示当前路径(this.route)
+```css
+    Page({
+        onShow: function() {
+            console.log(this.route)
+        }
+    })
+```
+## Page.prototype.setData(Object data, Function callback)
+    setData 函数用于将数据从逻辑层发送到视图层（异步），同时改变对应的 this.data 的值（同步）
+    参数data是本次要改变的数据,callback是setData引起的界面更新渲染完毕后的回调函数
+    Object 以 key: value 的形式表示，将 this.data 中的 key 对应的值改变成 value。
+    其中 key 可以以数据路径的形式给出，支持改变数组中的某一项或对象的某个属性，如 array[2].message，a.b.c.d，并且不需要在 this.data 中预先定义。
+    注意：
+    直接修改 this.data 而不调用 this.setData 是无法改变页面的状态的，还会造成数据不一致(与react相似)。
+    仅支持设置可 JSON 化的数据。
+    单次设置的数据不能超过1024kB，请尽量避免一次设置过多的数据。
+    请不要把 data 中任何一项的 value 设为 undefined ，否则这一项将不被设置并可能遗留一些潜在问题。
+## 页面间通信
+    如果一个页面由另一个页面通过 wx.navigateTo 打开，这两个页面间将建立一条数据通道：
+    被打开的页面可以通过 this.getOpenerEventChannel() 方法来获得一个 EventChannel 对象；
+    wx.navigateTo 的 success 回调中也包含一个 EventChannel 对象。
+    这两个 EventChannel 对象间可以使用 emit 和 on 方法相互发送、监听事件(事件总线)。
+## getCurrentPages()获取当前页面栈。数组中第一个元素为首页，最后一个元素为当前页面。onLaunch的时候还不能调用,因为当时还没生成
+
+## 自定义组件
+    https://developers.weixin.qq.com/miniprogram/dev/reference/api/Component.html
 
 
 
