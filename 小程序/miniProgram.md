@@ -217,10 +217,167 @@ text是item里面的数据,变为forbar数据,引入了item的模板,页面使�
 
 ## 自定义组件
     https://developers.weixin.qq.com/miniprogram/dev/reference/api/Component.html
+## Behavior(Object object)
+    注册一个 behavior，接受一个 Object 类型的参数。
+```css
+    module.exports = Behavior({
+        behaviors: [],
+        properties: {
+            myBehaviorProperty: {
+            type: String
+            }
+        },
+        data: {
+            myBehaviorData: {}
+        },
+        attached: function(){},
+        methods: {
+            myBehaviorMethod: function(){}
+        }
+    })
+```
+
+## 模块化
+```css
+    可以将一些公共的代码抽离成为一个单独的 js 文件，作为一个模块。模块只有通过 module.exports 或者 exports 才能对外暴露接口。
+```
+
+    require(string path)
+    引入模块。返回模块通过 module.exports 或 exports 暴露的接口。
+```css
+    // common.js
+    function sayHello(name) {
+        console.log(`Hello ${name} !`)
+    }
+    function sayGoodbye(name) {
+        console.log(`Goodbye ${name} !`)
+    }
+    module.exports.sayHello = sayHello//使用module.exports来暴露对象属性,让require可以获取(推荐使用这个)
+    exports.sayGoodbye = sayGoodbye //module.exports的引入,和上面的一样
+    //引入
+    var common = require('common.js')
+    Page({
+        helloMINA: function() {
+            common.sayHello('MINA')
+        },
+        goodbyeMINA: function() {
+            common.sayGoodbye('MINA')
+        }
+    })
+    /* 引入插件 */
+    requirePlugin(string path)
+    引入插件。返回插件通过 main 暴露的接口。参考 使用插件 - js 接口
+```
+## 基础功能
+    wx  小程序 API 全局对象，用于承载小程序能力相关 API。具体请参考小程序 API 参考文档。
+    wx.env  小程序环境变量对象wx.env.USER_DATA_PATH    文件系统中的用户目录路径
+    输出函数console
+```css
+    console.debug()
+    向调试面板中打印 debug 日志
+    console.log()
+    向调试面板中打印 log 日志
+    console.info()
+    向调试面板中打印 info 日志
+    console.warn()
+    向调试面板中打印 warn 日志
+    console.error()
+    向调试面板中打印 error 日志
+    console.group(string label)
+    在调试面板中创建一个新的分组。随后输出的内容都会被添加一个缩进，表示该内容属于当前分组。调用 console.groupEnd之后分组结束。
+    console.groupEnd()
+    结束由 console.group 创建的分组
+```
+    定时器setTimeout(function callback, number delay, any rest)设定一个定时器。在定时到期以后执行注册的回调函数,这个number是定时器定时器的编号,可以传递给clearTimeOut来取消定时器,其余和js的一样
+    setInterval也是一样
+## behavior的使用就和Vue的混入一样
+```css
+    module.exports = Behavior({
+        data: {
+            sharedText: 'This is a piece of data shared between pages.'
+        },
+        methods: {
+            sharedMethod: function() {
+            this.data.sharedText === 'This is a piece of data shared between pages.'
+            }
+        }
+    })
+// page-a.js
+    var myBehavior = require('./my-behavior.js')
+    Page({
+        behaviors: [myBehavior],//注册behaviors
+        onLoad: function() {
+            this.data.sharedText === 'This is a piece of data shared between pages.'
+        }
+    })
+```
+## 使用 Component 构造器用于定义组件，调用 Component 构造器时可以指定组件的属性、数据、方法等
+## 路由navigateTo, redirectTo 只能打开非 tabBar 页面。
+    <navigator open-type="navigateTo"/>
+注意:
+    switchTab 只能打开 tabBar 页面。
+    reLaunch 
+    页面底部的 tabBar 由页面决定，即只要是定义为 tabBar 的页面，底部都有 tabBar。
+    调用页面路由带的参数可以在目标页面的onLoad中获取。
 
 
 
 
+## 小程序API
+小程序 API 有以下几种类型：
+### 事件监听 API
+```css
+    以 on 开头的 API 用来监听某个事件是否触发，如：wx.onSocketOpen，wx.onCompassChange 等。
+    这类 API 接受一个回调函数作为参数，当事件触发时会调用这个回调函数，并将相关数据以参数形式传入。
+    wx.onCompassChange(function (res) {
+        console.log(res.direction)
+    })
+```  
+### 同步 API
+```css
+    以 Sync 结尾的 API 都是同步 API， 如 wx.setStorageSync，wx.getSystemInfoSync 等。此外，也有一些其他的同步 API，如 wx.createWorker，wx.getBackgroundAudioManager 等，详情参见 API 文档中的说明。
+同步 API 的执行结果可以通过函数返回值直接获取，如果执行出错会抛出异常。
+    try {
+        wx.setStorageSync('key', 'value')
+    } catch (e) {
+        console.error(e)
+    }
+```
+### 异步 API
+```css
+    大多数 API 都是异步 API，如 wx.request，wx.login 等。这类 API 接口通常都接受一个 Object 类型的参数，这个参数都支持按需指定以下字段来接收接口调用结果：
+    Object 参数说明:
+    参数名	    类型	必填	说明
+    success	    function	否	接口调用成功的回调函数
+    fail	    function	否	接口调用失败的回调函数
+    complete	function	否	接口调用结束的回调函数（调用成功、失败都会执行）
+    其他	    Any	-	接口定义的其他参数
 
-
-
+    回调函数的参数
+    success，fail，complete 函数调用时会传入一个 Object 类型参数，包含以下字段：
+    属性	    类型	说明
+    errMsg	    string	错误信息，如果调用成功返回 ${apiName}:ok
+    errCode	    number	错误码，仅部分 API 支持，具体含义请参考对应 API 文档，成功时为 0。
+    其他	    Any	    接口返回的其他数据
+    wx.login({
+        success(res) {
+            console.log(res.code)
+        }
+    })
+```
+## 异步API返回promise
+    基础库 2.10.2 版本起，异步 API 支持 callback & promise 两种调用方式。当接口参数 Object 对象中不包含 success/fail/complete 时将默认返回 promise，否则仍按回调方式执行，无返回值。
+注意事项
+    部分接口如 downloadFile, request, uploadFile, connectSocket, createCamera（小游戏）本身就有返回值， 它们的 promisify 需要开发者自行封装。
+    当没有回调参数时，异步接口返回 promise。此时若函数调用失败进入 fail 逻辑， 会报错提示 Uncaught (in promise)，开发者可通过 catch 来进行捕获。
+    wx.onUnhandledRejection 可以监听未处理的 Promise 拒绝事件。
+```css
+    // callback 形式调用
+    wx.chooseImage({
+        success(res) {
+            console.log('res:', res)
+    }
+})
+    // promise 形式调用
+    wx.chooseImage().then(res => console.log('res: ', res))
+```
