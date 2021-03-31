@@ -288,7 +288,7 @@ text是item里面的数据,变为forbar数据,引入了item的模板,页面使�
     console.groupEnd()
     结束由 console.group 创建的分组
 ```
-    定时器setTimeout(function callback, number delay, any rest)设定一个定时器。在定时到期以后执行注册的回调函数,这个number是定时器定时器的编号,可以传递给clearTimeOut来取消定时器,其余和js的一样
+    定时器setTimeout(function callback, delay,number , any rest)设定一个定时器。在定时到期以后执行注册的回调函数,这个number是定时器定时器的编号,可以传递给clearTimeOut来取消定时器,其余和js的一样
     setInterval也是一样
 ## behavior的使用就和Vue的混入一样
 ```css
@@ -316,7 +316,7 @@ text是item里面的数据,变为forbar数据,引入了item的模板,页面使�
     <navigator open-type="navigateTo"/>
 注意:
     switchTab 只能打开 tabBar 页面。
-    reLaunch 
+    onLaunch 
     页面底部的 tabBar 由页面决定，即只要是定义为 tabBar 的页面，底部都有 tabBar。
     调用页面路由带的参数可以在目标页面的onLoad中获取。
 
@@ -370,7 +370,7 @@ text是item里面的数据,变为forbar数据,引入了item的模板,页面使�
 注意事项
     部分接口如 downloadFile, request, uploadFile, connectSocket, createCamera（小游戏）本身就有返回值， 它们的 promisify 需要开发者自行封装。
     当没有回调参数时，异步接口返回 promise。此时若函数调用失败进入 fail 逻辑， 会报错提示 Uncaught (in promise)，开发者可通过 catch 来进行捕获。
-    wx.onUnhandledRejection 可以监听未处理的 Promise 拒绝事件。
+    wx.onUnhandledRejection 可以监听未处理的 Promise 拒绝事件。(具体看你自己是否制定success和fail函数)
 ```css
     // callback 形式调用
     wx.chooseImage({

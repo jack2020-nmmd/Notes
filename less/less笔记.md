@@ -1,7 +1,7 @@
 ## less的变量
 ```css
     @orange : #ff6600
-    @f18 : font-size : 18px
+    @f18 {font-size : 18px} 
     这是声明了一个orange变量,后面可以直接使用这个变量,当大量使用时要更改方便
     变量的使用和定义都要用@符号
 ```
