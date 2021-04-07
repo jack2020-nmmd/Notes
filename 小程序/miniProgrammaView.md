@@ -290,3 +290,22 @@ var the-id = query.select('#the-id')
     }
     }
 ```
+## 退出状态
+```css
+    每当小程序可能被销毁之前，页面回调函数 onSaveExitState 会被调用。如果想保留页面中的状态，可以在这个回调函数中“保存”一些数据，下次启动时可以通过 exitState 获得这些已保存数据。
+    Page({
+        onLoad: function() {
+            var prevExitState = this.exitState // 尝试获得上一次退出前 onSaveExitState 保存的数据
+            if (prevExitState !== undefined) { // 如果是根据 restartStrategy 配置进行的冷启动，就可以获取到
+            prevExitState.myDataField === 'myData' 
+            }
+        },
+        onSaveExitState: function() {
+            var exitState = { myDataField: 'myData' } // 需要保存的数据
+            return {
+            data: exitState,//可以任意类型
+            expireTimeStamp: Date.now() + 24 * 60 * 60 * 1000 // 超时时刻,在这个时刻后，保存的数据保证一定被丢弃，默认为 (当前时刻 + 1 天)
+            }
+        }
+    })
+```
